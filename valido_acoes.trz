@@ -1,0 +1,11 @@
+acao fatorial(int n) ritorna int [
+    mutabile int resultado = 1;
+    ritorna resultado;
+]
+acao Traduzi() void [
+    int n;
+    input(n);
+    stampa(reale(fatorial(n)) / 2);
+    string s = :Ola, mundo com acentuação:;
+    bool Idade = false; bool IDADE = true;
+]

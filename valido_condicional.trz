@@ -1,0 +1,10 @@
+acao Traduzi() void [
+    int idade = 20;
+    in caso di -idade >= 18- succede [
+        stampa(:Maior de idade:);
+    ] altrimenti in caso di -idade - 1 > 0- succede [
+        stampa(:Quase:);
+    ] altrimenti [
+        stampa(:Menor de idade:);
+    ]
+]

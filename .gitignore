@@ -1,0 +1,8 @@
+cat > .gitignore <<'EOF'
+lex.yy.c
+lexer_test
+lexer_test.exe
+*.o
+parser.tab.c
+parser.tab.h
+EOF
