@@ -1,0 +1,31 @@
+acao soma(int a, int b) ritorna int [
+    ritorna a + b;
+]
+
+acao Traduzi() void [
+    int idade;
+    input(idade);
+    string nome = :Ola, mundo:;
+    bool aprovado = not idade < 18 and true or false;
+    float media = reale(soma(10, 5)) / 2;
+    int parte = intero(media);
+    mutabile int i = 0;
+    stampa(nome);
+    in caso di -idade >= 18- succede [
+        stampa(:Maior de idade:);
+    ] altrimenti in caso di -idade >= 12- succede [
+        stampa(:Adolescente:);
+    ] altrimenti [
+        stampa(:Crianca:);
+    ]
+    mentre -i - 1 < 3- [
+        i = i + 1;
+        continuare;
+    ]
+    per contador de -2 ate 5 [
+        stampa(contador);
+        fermarsi;
+    ]
+    soma(parte, 2);
+    ritorna;
+]
