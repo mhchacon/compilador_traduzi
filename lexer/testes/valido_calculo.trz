@@ -1,0 +1,8 @@
+~> Programa 1: calculo
+acao Traduzi() void [
+    int a = 10;
+    int b = 5;
+    int resultado = a + b * 2;
+    float pi = 3.14;
+    stampa(resultado);
+]

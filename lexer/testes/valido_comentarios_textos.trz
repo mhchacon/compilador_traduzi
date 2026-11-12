@@ -1,0 +1,16 @@
+~> comentario de uma linha
+~{
+   comentario de
+   varias linhas com } e ~> dentro
+}~
+acao Traduzi() void [
+    string nome = :Lawrence Silva:;
+    string acentos = :Ação, coração e pão!:;
+    float pi = 3.14;
+    float zero = 0.5;
+    bool ok = true;
+    bool no = false;
+    stampa(:Ola, mundo:); ~> depois do codigo
+    ~{ bloco no meio }~ int _x1 = 0;
+    in caso di -a >= 1 and b <= 2 or c != 3 and d == 4- succede [ ]
+]

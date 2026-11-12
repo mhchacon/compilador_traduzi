@@ -1,0 +1,21 @@
+~> Regra do hifen: abre condicao, subtracao, negativo unario e fecha condicao
+acao Traduzi() void [
+    int a = 7;
+    int b = -5;
+    int c = a - b;
+    in caso di -a - b > 0- succede [
+        stampa(:subtracao dentro da condicao:);
+    ] altrimenti in caso di --a < b- succede [
+        stampa(:negativo logo apos abrir:);
+    ] altrimenti [
+        stampa(:nenhuma:);
+    ]
+    mutabile int i = 3;
+    mentre -i - 1 > 0- [
+        i = i - 1;
+    ]
+    mentre -(a - b) * 2 > 0 and not (c == 1)- ~> comentario entre o hifen e o colchete
+    [
+        fermarsi;
+    ]
+]

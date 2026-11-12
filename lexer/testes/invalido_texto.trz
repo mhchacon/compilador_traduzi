@@ -1,0 +1,4 @@
+acao Traduzi() void [
+    stampa(:texto sem fechamento);
+    int x = 1;
+]

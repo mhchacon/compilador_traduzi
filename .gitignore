@@ -3,3 +3,6 @@ parser.tab.h
 lex.yy.c
 traduzi
 traduzi.exe
+lexer_test
+lexer_test.exe
+*.o

@@ -29,4 +29,22 @@ traduzi: parser.tab.c lex.yy.c ast.c ast.h main.c
 test: traduzi
 	node tests/test.cjs
 
-.PHONY: all parser test
+# ---- Testes isolados do analisador lexico (integrante 1) ----
+lexer_test: parser.tab.c parser.tab.h lex.yy.c ast.c lexer/lexer_test.c
+	$(CC) $(CFLAGS) -I. -o lexer_test parser.tab.c lex.yy.c ast.c lexer/lexer_test.c
+
+test-lexer: lexer_test
+	@set -e; \
+	for f in lexer/testes/valido_*.trz; do \
+		if ./lexer_test "$$f" > /dev/null; then echo "OK      $$f"; \
+		else echo "FALHOU  $$f (deveria ser aceito)"; exit 1; fi; \
+	done; \
+	for f in lexer/testes/invalido_*.trz; do \
+		if ./lexer_test "$$f" > /dev/null 2>&1; then echo "FALHOU  $$f (deveria dar erro lexico)"; exit 1; \
+		else echo "OK      $$f (erro lexico detectado)"; fi; \
+	done
+
+clean:
+	rm -f lex.yy.c parser.tab.c parser.tab.h traduzi traduzi.exe lexer_test lexer_test.exe
+
+.PHONY: all parser test test-lexer clean

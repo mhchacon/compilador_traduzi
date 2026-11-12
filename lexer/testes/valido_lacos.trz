@@ -1,0 +1,16 @@
+~{
+  Comentario de
+  varias linhas
+}~
+acao Traduzi() void [
+    mutabile int i = 1;
+    mentre -i <= 3- [
+        stampa(i);
+        i = i + 1;
+    ]
+    per contador de 1 ate 5 [
+        in caso di -not (contador == 2) and true- succede [ continuare; ]
+        fermarsi;
+    ]
+    stampa(-5 + intero(2.5) - -1);
+]

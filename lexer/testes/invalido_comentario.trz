@@ -1,0 +1,5 @@
+acao Traduzi() void [
+    int x = 1;
+]
+~{ este comentario nunca fecha
+   linha 2

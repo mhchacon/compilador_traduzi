@@ -1,0 +1,8 @@
+acao Traduzi() void [
+    int x = 10 @ 2;
+    int função = 3;
+    bool b = x & 1 | 2;
+    string s = "aspas";
+    if (x) { }
+    int y = !x;
+]

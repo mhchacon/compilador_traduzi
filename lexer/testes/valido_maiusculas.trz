@@ -1,0 +1,10 @@
+~> idade, Idade e IDADE sao tres identificadores; Int e traduzi tambem
+acao Traduzi() void [
+    int idade = 1;
+    int Idade = 2;
+    int IDADE = 3;
+    int Int = 4;
+    int traduzi = 5;
+    int succede_x = 6;
+    int r = idade -succede_x;
+]
