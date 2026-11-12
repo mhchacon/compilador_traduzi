@@ -1,4 +1,5 @@
 #include "parser.tab.h"
+#include "semantic.h"
 #include <stdlib.h>
 
 extern FILE *yyin;
@@ -17,7 +18,14 @@ int main(int argc, char **argv) {
     resultado = yyparse();
     if (argc == 2) fclose(yyin);
     yylex_destroy();
-    if (!resultado && !erros_sintaticos && !erros_lexicos) ast_imprimir(ast_raiz, stdout, 0);
+    if (!resultado && !erros_sintaticos && !erros_lexicos) {
+        if (!check_semantics(ast_raiz)) {
+            ast_liberar(ast_raiz);
+            ast_raiz = NULL;
+            return EXIT_FAILURE;
+        }
+        ast_imprimir(ast_raiz, stdout, 0);
+    }
     ast_liberar(ast_raiz);
     ast_raiz = NULL;
     return resultado || erros_sintaticos || erros_lexicos ? EXIT_FAILURE : EXIT_SUCCESS;

@@ -37,6 +37,7 @@ int add_symbol(const char* name, DataType type, int is_mutable, int is_action) {
     }
     Symbol* sym = (Symbol*)malloc(sizeof(Symbol));
     strncpy(sym->name, name, 99);
+    sym->name[99] = '\0';
     sym->type = type;
     sym->is_mutable = is_mutable;
     sym->is_initialized = 0;
@@ -67,4 +68,10 @@ Symbol* lookup_symbol(const char* name) {
         scope = scope->parent;
     }
     return NULL;
+}
+
+void free_symbol_table() {
+    while (current_scope) {
+        exit_scope();
+    }
 }

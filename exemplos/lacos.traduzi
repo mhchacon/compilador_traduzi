@@ -1,0 +1,11 @@
+acao Traduzi() void [
+    mutabile int i = 0;
+    mentre -i < 3- [
+        stampa(i);
+        i = i + 1;
+    ]
+    per contador de -2 ate 4 [
+        stampa(contador);
+        fermarsi;
+    ]
+]

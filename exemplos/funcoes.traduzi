@@ -1,0 +1,8 @@
+acao dobro(int valor) ritorna int [
+    ritorna valor + valor;
+]
+
+acao Traduzi() void [
+    int resultado = dobro(4);
+    stampa(resultado);
+]

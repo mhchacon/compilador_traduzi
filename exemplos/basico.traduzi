@@ -1,0 +1,8 @@
+acao Traduzi() void [
+    int idade = 20;
+    float altura = 1.75;
+    bool maior = idade >= 18;
+    stampa(idade);
+    stampa(altura);
+    stampa(maior);
+]

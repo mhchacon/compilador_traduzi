@@ -7,7 +7,7 @@ LEXER = lexer/lexer.l
 .SUFFIXES:
 .DEFAULT_GOAL := all
 
-all: parser
+all: traduzi
 
 parser: parser.tab.c parser.tab.h
 
@@ -23,8 +23,8 @@ $(LEXER):
 	@echo "Lexer pendente: adicione o arquivo em $(LEXER). Consulte lexer/README.md."
 	@exit 1
 
-traduzi: parser.tab.c lex.yy.c ast.c ast.h main.c
-	$(CC) $(CFLAGS) -o traduzi parser.tab.c lex.yy.c ast.c main.c
+traduzi: parser.tab.c lex.yy.c ast.c ast.h semantic.c semantic.h symbol_table.c symbol_table.h main.c
+	$(CC) $(CFLAGS) -o traduzi parser.tab.c lex.yy.c ast.c semantic.c symbol_table.c main.c
 
 test: traduzi
 	node tests/test.cjs

@@ -1,69 +1,141 @@
-Análise Semântica e Geração de Código: Linguagem Traduzi
+# Compilador Traduzi
 
-Este documento explica os componentes e a lógica por trás da implementação em C da Etapa 3 (Análise Semântica) e Etapa 4 (Geração de Código Python) do compilador da linguagem Traduzi.
+Compilador da linguagem **Traduzi**, implementado em C. O programa executa
+as etapas de análise léxica, sintática e semântica e imprime a árvore sintática
+abstrata (AST) quando o código é válido.
 
-O fluxo do compilador após a Análise Sintática (feita pelo Bison) baseia-se em percorrer a Árvore Sintática Abstrata (AST).
+## Pré-requisitos
 
-1. A Estrutura Base: Árvore Sintática Abstrata (AST)
+Instale e deixe disponíveis no `PATH`:
 
-O arquivo ast.h define a estrutura fundamental que conecta o analisador sintático às próximas fases.
+- GCC;
+- Make;
+- Flex;
+- Bison;
+- Node.js (necessário para executar os testes).
 
-NodeType e DataType: Ajudam a classificar o que é cada nó (um laço, uma condicional, uma declaração) e o tipo de dado que ele carrega (inteiro, float, bool).
+No Windows, uma opção é usar o [MSYS2](https://www.msys2.org/) com o ambiente
+MinGW. Os comandos abaixo devem ser executados em um terminal que tenha
+`gcc`, `make`, `flex`, `bison` e `node` disponíveis.
 
-Campos de Dados: O nó guarda valores específicos (int_value, string_value, name) dependendo do seu tipo.
+## Como compilar
 
-Ponteiros de Navegação (left, right, next): Permitem montar a árvore. O next é especialmente útil para encadear listas de comandos dentro de um bloco ou listas de parâmetros, enquanto left e right guardam as expressões ou condições de um comando.
+Na raiz do projeto, execute:
 
-2. A Tabela de Símbolos (symbol_table.h / .c)
+```sh
+make traduzi
+```
 
-A tabela de símbolos atua como a "memória" do compilador durante a análise semântica. Ela registra todas as variáveis e ações declaradas.
+Esse comando:
 
-Gerenciamento de Escopo: Implementado como uma pilha (usando ponteiros parent). Cada vez que o código entra em um bloco [...] (seja de uma ação, condicional ou laço), enter_scope() é chamado. Ao sair, exit_scope() limpa as variáveis daquele bloco, garantindo que variáveis locais não vazem para o escopo externo.
+1. gera `parser.tab.c` e `parser.tab.h` a partir de `parser.y` usando o
+   Bison;
+2. gera `lex.yy.c` a partir de `lexer/lexer.l` usando o Flex;
+3. compila os arquivos C, incluindo a análise semântica e a tabela de
+   símbolos, e cria o executável `traduzi` (ou `traduzi.exe` no Windows).
 
-Registro de Propriedades: A estrutura Symbol guarda o nome, o tipo, se a variável já recebeu valor (is_initialized) e se foi declarada com a palavra-chave mutabile (is_mutable).
+Para gerar apenas os arquivos do parser, use:
 
-Busca (lookup_symbol): Procura uma variável no escopo atual e, se não achar, sobe para os escopos pais até chegar ao global.
+```sh
+make parser
+```
 
-3. A Análise Semântica (semantic.h / .c)
+## Como executar
 
-O papel do analisador semântico é garantir que o programa faça sentido lógico e respeite as regras da Traduzi descritas no documento de especificação, mesmo que a sintaxe esteja correta.
+### Traduzir um arquivo
 
-Ele percorre a AST recursivamente (analyze_node) executando as seguintes validações:
+Passe um arquivo `.traduzi` como argumento:
 
-Ação Principal Obrigatória: Ao analisar a raiz do programa, verifica se existe uma ação chamada Traduzi declarada sem parâmetros e com retorno void.
+```sh
+./traduzi exemplos/completo.traduzi
+```
 
-Declaração e Inicialização: Impede o uso de variáveis não declaradas ou o uso antes de receberem um valor inicial.
+No Windows, o equivalente é:
 
-Checagem de Tipos: Verifica se operações matemáticas não estão misturando textos com números, e se as condições do in caso di e mentre são do tipo booleano (T_BOOL).
+```powershell
+.\traduzi.exe exemplos\completo.traduzi
+```
 
-Regra de Imutabilidade: Bloqueia reatribuições (nó NODE_ASSIGN) a variáveis que não possuem a flag mutabile.
+Se o programa for válido nas três análises, a AST será impressa no terminal.
+Em caso de erro léxico, sintático ou semântico, o diagnóstico será enviado
+para a saída de erro e o processo terminará com falha.
 
-Controle de Fluxo: Usa um contador (in_loop) para garantir que os comandos fermarsi (break) e continuare (continue) só sejam chamados de dentro de um laço de repetição.
+### Ler o código pela entrada padrão
 
-Se qualquer regra for violada, a função report_error exibe a mensagem de diagnóstico, incrementa o contador de erros e impede a geração de código.
+Também é possível executar o tradutor sem informar um arquivo e fornecer o
+código pelo terminal:
 
-4. O Gerador de Código Python (codegen_python.c)
+```sh
+echo "acao Traduzi() void []" | ./traduzi
+```
 
-Se a função check_semantics retornar sucesso (zero erros), o compilador chama a geração de código. Python foi escolhido como o primeiro destino.
+No PowerShell:
 
-O gerador faz uma nova travessia na AST validada:
+```powershell
+'acao Traduzi() void []' | .\traduzi.exe
+```
 
-Tradução Direta de Comandos: Nós como NODE_PRINT viram print(), NODE_WHILE viram while, e assim por diante.
+O executável aceita no máximo um arquivo de entrada:
 
-Controle de Indentação: Ao contrário de C ou da própria Traduzi (que usa []), blocos em Python dependem de espaços. A variável global indent_level aumenta ao entrar em um bloco e diminui ao sair. A função print_indent() escreve os espaços necessários antes de cada linha.
+```text
+Uso: traduzi [arquivo.traduzi]
+```
 
-Laço per: Traduzido para um for do Python usando a função range(). Como a linguagem Traduzi define limites inclusivos, o gerador adiciona + 1 ao limite superior do range.
+### Exemplos adicionais
 
-Chamada Principal: Ao final do arquivo Python gerado, o código insere automaticamente a chamada condicional if __name__ == '__main__': Traduzi(), que é o padrão Python para iniciar a execução.
+Exemplos válidos:
 
-5. Integração
+```sh
+./traduzi exemplos/basico.traduzi
+./traduzi exemplos/funcoes.traduzi
+./traduzi exemplos/lacos.traduzi
+```
 
-O fluxo de vida do seu programa main.c será:
+Exemplos que devem produzir erro semântico:
 
-Lex (Análise Léxica): Converte texto em Tokens.
+```sh
+./traduzi exemplos/erro_tipo.traduzi
+./traduzi exemplos/erro_variavel.traduzi
+./traduzi exemplos/erro_laco.traduzi
+```
 
-Bison (Análise Sintática): Consome Tokens, valida a gramática e constrói a variável global root_ast.
+## Testes
 
-Módulo Semântico: Avalia check_semantics(root_ast).
+Depois de compilar o executável, execute a suíte de testes do parser e do
+lexer:
 
-Módulo Gerador: Se aprovado, executa generate_python(root_ast) imprimindo o código final na tela (ou em um arquivo .py).
+```sh
+make test
+```
+
+Para executar somente os testes isolados do analisador léxico:
+
+```sh
+make test-lexer
+```
+
+Os testes isolados usam os arquivos em `lexer/testes/`. Para remover os
+arquivos gerados e os executáveis:
+
+```sh
+make clean
+```
+
+## Estrutura e fluxo
+
+1. O **Flex** converte o código-fonte em tokens.
+2. O **Bison** valida a gramática e constrói a AST.
+3. A análise semântica valida declarações, tipos, escopos, atribuições,
+   chamadas, retornos e comandos de laço.
+4. O programa principal imprime a AST somente quando não há erros.
+
+Arquivos principais:
+
+- `parser.y`: gramática e regras de construção da AST;
+- `lexer/lexer.l`: analisador léxico;
+- `ast.c` e `ast.h`: estruturas e operações da AST;
+- `semantic.c` e `semantic.h`: análise semântica;
+- `symbol_table.c` e `symbol_table.h`: tabela de símbolos e escopos;
+- `main.c`: entrada do programa e tratamento do arquivo de entrada;
+- `Makefile`: regras de geração, compilação, testes e limpeza;
+- `exemplos/completo.traduzi`: exemplo completo de programa Traduzi.

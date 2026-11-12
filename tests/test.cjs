@@ -12,13 +12,13 @@ const validos = [
     '', 'int x = 10 + 5 * 2; stampa(x);',
     'int x = (10 + 5) * 2;',
     'bool x = not 1 < 2 and true or false;',
-    'in caso di -a - b > -2- succede [] altrimenti []',
-    'mentre --x < 2- []',
+    'in caso di -1 - 2 > -2- succede [] altrimenti []',
+    'mentre --1 < 2- []',
     'mentre -true- ~> fechamento\n []',
     'in caso di -true- ~{ fechamento }~ succede []',
-    'per i de -1 ate f(2, 3) [ continuare; fermarsi; ]',
+    'per i de -1 ate 3 [ continuare; fermarsi; ]',
     'string nome; input(nome); stampa(:Ola, mundo:);',
-    'float x = reale(intero(2.5)); f(); ritorna;'
+    'float x = reale(intero(2.5)); ritorna;'
 ];
 for (const body of validos) {
     const result = run(wrap(body));
@@ -30,13 +30,14 @@ const invalidos = [
     'bool x = true == false == true;', 'int x = 2',
     'stampa(:a:, :b:);', 'int 2idade = 2;', 'float x = .5;',
     'float x = 5.;', 'stampa(:aberto);', '@;', '~{ aberto',
-    'acao outra() void []', 'Traduzi();'
+    'acao outra() void []', 'Traduzi();',
+    'int x = :texto:;', 'x = 1;', 'f();', 'fermarsi;'
 ];
 for (const body of invalidos) {
     const result = run(wrap(body));
     assert.notEqual(result.status, 0, body);
     assert.equal(result.stdout, '', body);
-    assert.match(result.stderr, /Erro (sintatico|lexico) linha \d+, coluna \d+:/);
+    assert.match(result.stderr, /Erro (sintatico|lexico|semantico) linha \d+, coluna \d+:/);
 }
 const precedence = run(wrap('int x = 10 + 5 * 2;')).stdout;
 assert.match(precedence, /operacao \+[\s\S]*inteiro 10[\s\S]*operacao \*[\s\S]*inteiro 5[\s\S]*inteiro 2/);
