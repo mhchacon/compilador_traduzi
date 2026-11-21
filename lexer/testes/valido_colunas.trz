@@ -1,0 +1,6 @@
+~> Colunas contam caracteres, nao bytes: apos textos com acento a coluna segue correta.
+acao Traduzi() void [
+    stampa(:pão:); stampa(:ação:); stampa(1);
+    string s = :ç:; ~> comentario com acentuação
+    int x = 1; int y = 2;
+]

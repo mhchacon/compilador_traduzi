@@ -1,0 +1,9 @@
+~> Caracteres nao permitidos fora de textos (dentro de :...: sao aceitos).
+acao Traduzi() void [
+    int a = 5;
+    int b = a – 1;
+    int c = 3;
+    string s = “texto”;
+    int funçao = 1;
+    int 😀 = 2;
+]

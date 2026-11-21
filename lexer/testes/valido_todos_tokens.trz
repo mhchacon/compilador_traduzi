@@ -1,0 +1,41 @@
+~> Usa todos os tokens da linguagem pelo menos uma vez.
+~> Tambem e um programa completo e valido para o traduzi.
+acao somar(int a, int b) ritorna int [
+    ritorna a + b;
+]
+
+acao Traduzi() void [
+    mutabile int i = 0;
+    int n;
+    float f = 3.5;
+    string s = :Ola, mundo:;
+    bool b = true;
+    bool c = false;
+    input(n);
+    int neg = -n;
+    in caso di -n >= 10 and not b- succede [
+        stampa(s);
+    ] altrimenti in caso di -n <= 5 or c- succede [
+        stampa(f);
+    ] altrimenti in caso di -n == 7- succede [
+        stampa(somar(1, 2));
+    ] altrimenti in caso di -n != 8- succede [
+        stampa(n / 2 - 1);
+    ] altrimenti [
+        stampa(intero(f) + 1);
+        stampa(reale(n) * 1.5);
+    ]
+    mentre -i < 10- [
+        i = i + 1;
+        in caso di -i > 5- succede [
+            fermarsi;
+        ]
+        in caso di -i < 2- succede [
+            continuare;
+        ]
+    ]
+    per k de 1 ate 3 [
+        stampa(k);
+    ]
+    ritorna;
+]
