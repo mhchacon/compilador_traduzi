@@ -1,0 +1,28 @@
+  1:1  -  1:5    ACAO        
+  1:6  -  1:13   TRADUZI     
+  1:13 -  1:14   '('
+  1:14 -  1:15   ')'
+  1:16 -  1:20   VOID        
+  1:21 -  1:22   '['
+  2:5  -  2:10   FLOAT       
+  2:11 -  2:12   IDENT        "a"
+  2:13 -  2:14   '='
+Erro lexico linha 2, coluna 15: numero real invalido '.5': faltam digitos antes do ponto.
+  2:15 -  2:17   INVALIDO    
+  2:17 -  2:18   ';'
+  3:5  -  3:10   FLOAT       
+  3:11 -  3:12   IDENT        "b"
+  3:13 -  3:14   '='
+Erro lexico linha 3, coluna 15: numero real invalido '5.': faltam digitos depois do ponto.
+  3:15 -  3:17   INVALIDO    
+  3:17 -  3:18   ';'
+  4:5  -  4:10   FLOAT       
+  4:11 -  4:12   IDENT        "c"
+  4:13 -  4:14   '='
+Erro lexico linha 4, coluna 15: numero real mal formado '3.14abc'.
+  4:15 -  4:22   INVALIDO    
+  4:22 -  4:23   ';'
+  5:1  -  5:2    ']'
+  6:1         EOF
+
+3 erro(s) lexico(s).

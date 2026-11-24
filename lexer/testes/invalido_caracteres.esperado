@@ -1,0 +1,63 @@
+  1:1  -  1:5    ACAO        
+  1:6  -  1:13   TRADUZI     
+  1:13 -  1:14   '('
+  1:14 -  1:15   ')'
+  1:16 -  1:20   VOID        
+  1:21 -  1:22   '['
+  2:5  -  2:8    INT         
+  2:9  -  2:10   IDENT        "x"
+  2:11 -  2:12   '='
+  2:13 -  2:15   INT_LIT      "10"
+Erro lexico linha 2, coluna 16: caractere invalido '@'.
+  2:16 -  2:17   INVALIDO    
+  2:18 -  2:19   INT_LIT      "2"
+  2:19 -  2:20   ';'
+  3:5  -  3:8    INT         
+  3:9  -  3:12   IDENT        "fun"
+Erro lexico linha 3, coluna 12: caractere nao permitido fora de textos 'ç' (U+00E7). Identificadores aceitam apenas letras sem acento, numeros e '_'.
+  3:12 -  3:13   INVALIDO    
+Erro lexico linha 3, coluna 13: caractere nao permitido fora de textos 'ã' (U+00E3). Identificadores aceitam apenas letras sem acento, numeros e '_'.
+  3:13 -  3:14   INVALIDO    
+  3:14 -  3:15   IDENT        "o"
+  3:16 -  3:17   '='
+  3:18 -  3:19   INT_LIT      "3"
+  3:19 -  3:20   ';'
+  4:5  -  4:9    BOOL        
+  4:10 -  4:11   IDENT        "b"
+  4:12 -  4:13   '='
+  4:14 -  4:15   IDENT        "x"
+Erro lexico linha 4, coluna 16: caractere '&' invalido. Use 'and'.
+  4:16 -  4:17   INVALIDO    
+  4:18 -  4:19   INT_LIT      "1"
+Erro lexico linha 4, coluna 20: caractere '|' invalido. Use 'or'.
+  4:20 -  4:21   INVALIDO    
+  4:22 -  4:23   INT_LIT      "2"
+  4:23 -  4:24   ';'
+  5:5  -  5:11   STRING      
+  5:12 -  5:13   IDENT        "s"
+  5:14 -  5:15   '='
+Erro lexico linha 5, coluna 16: caractere " invalido. Textos usam dois-pontos, como em :texto:.
+  5:16 -  5:17   INVALIDO    
+  5:17 -  5:22   IDENT        "aspas"
+Erro lexico linha 5, coluna 22: caractere " invalido. Textos usam dois-pontos, como em :texto:.
+  5:22 -  5:23   INVALIDO    
+  5:23 -  5:24   ';'
+  6:5  -  6:7    IDENT        "if"
+  6:8  -  6:9    '('
+  6:9  -  6:10   IDENT        "x"
+  6:10 -  6:11   ')'
+Erro lexico linha 6, coluna 12: caractere '{' invalido. Blocos usam '[' e ']'.
+  6:12 -  6:13   INVALIDO    
+Erro lexico linha 6, coluna 14: caractere '}' invalido. Blocos usam '[' e ']'.
+  6:14 -  6:15   INVALIDO    
+  7:5  -  7:8    INT         
+  7:9  -  7:10   IDENT        "y"
+  7:11 -  7:12   '='
+Erro lexico linha 7, coluna 13: caractere '!' inesperado. Use 'not' para negacao ou '!=' para diferente.
+  7:13 -  7:14   INVALIDO    
+  7:14 -  7:15   IDENT        "x"
+  7:15 -  7:16   ';'
+  8:1  -  8:2    ']'
+  9:1         EOF
+
+10 erro(s) lexico(s).
