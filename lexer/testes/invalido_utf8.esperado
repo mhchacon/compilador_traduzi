@@ -1,0 +1,53 @@
+  2:1  -  2:5    ACAO        
+  2:6  -  2:13   TRADUZI     
+  2:13 -  2:14   '('
+  2:14 -  2:15   ')'
+  2:16 -  2:20   VOID        
+  2:21 -  2:22   '['
+  3:5  -  3:8    INT         
+  3:9  -  3:10   IDENT        "a"
+  3:11 -  3:12   '='
+  3:13 -  3:14   INT_LIT      "5"
+  3:14 -  3:15   ';'
+  4:5  -  4:8    INT         
+  4:9  -  4:10   IDENT        "b"
+  4:11 -  4:12   '='
+  4:13 -  4:14   IDENT        "a"
+Erro lexico linha 4, coluna 15: caractere nao permitido '–' (U+2013): parece um hifen; use o hifen comum '-'.
+  4:15 -  4:16   INVALIDO    
+  4:17 -  4:18   INT_LIT      "1"
+  4:18 -  4:19   ';'
+  5:5  -  5:8    INT         
+Erro lexico linha 5, coluna 8: caractere nao permitido ' ' (U+00A0): espaco nao separavel; troque por um espaco comum.
+  5:8  -  5:9    INVALIDO    
+  5:9  -  5:10   IDENT        "c"
+  5:11 -  5:12   '='
+  5:13 -  5:14   INT_LIT      "3"
+  5:14 -  5:15   ';'
+  6:5  -  6:11   STRING      
+  6:12 -  6:13   IDENT        "s"
+  6:14 -  6:15   '='
+Erro lexico linha 6, coluna 16: caractere nao permitido '“' (U+201C): aspas tipograficas; textos usam dois-pontos, como em :texto:.
+  6:16 -  6:17   INVALIDO    
+  6:17 -  6:22   IDENT        "texto"
+Erro lexico linha 6, coluna 22: caractere nao permitido '”' (U+201D): aspas tipograficas; textos usam dois-pontos, como em :texto:.
+  6:22 -  6:23   INVALIDO    
+  6:23 -  6:24   ';'
+  7:5  -  7:8    INT         
+  7:9  -  7:12   IDENT        "fun"
+Erro lexico linha 7, coluna 12: caractere nao permitido fora de textos 'ç' (U+00E7). Identificadores aceitam apenas letras sem acento, numeros e '_'.
+  7:12 -  7:13   INVALIDO    
+  7:13 -  7:15   IDENT        "ao"
+  7:16 -  7:17   '='
+  7:18 -  7:19   INT_LIT      "1"
+  7:19 -  7:20   ';'
+  8:5  -  8:8    INT         
+Erro lexico linha 8, coluna 9: caractere nao permitido fora de textos '😀' (U+1F600). Identificadores aceitam apenas letras sem acento, numeros e '_'.
+  8:9  -  8:10   INVALIDO    
+  8:11 -  8:12   '='
+  8:13 -  8:14   INT_LIT      "2"
+  8:14 -  8:15   ';'
+  9:1  -  9:2    ']'
+ 10:1         EOF
+
+6 erro(s) lexico(s).
