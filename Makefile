@@ -29,6 +29,12 @@ traduzi: parser.tab.c lex.yy.c ast.c ast.h semantic.c semantic.h symbol_table.c 
 test: traduzi
 	node tests/test.cjs
 
+parser_test: parser.tab.c parser.tab.h lex.yy.c ast.c ast.h tests/parser_main.c
+	$(CC) $(CFLAGS) -I. -o parser_test parser.tab.c lex.yy.c ast.c tests/parser_main.c
+
+test-parser: parser_test
+	node tests/parser.cjs
+
 # ---- Testes isolados do analisador lexico (integrante 1) ----
 lexer_test: parser.tab.c parser.tab.h lex.yy.c ast.c lexer/lexer_test.c
 	$(CC) $(CFLAGS) -I. -o lexer_test parser.tab.c lex.yy.c ast.c lexer/lexer_test.c
@@ -45,6 +51,6 @@ test-lexer: lexer_test
 	done
 
 clean:
-	rm -f lex.yy.c parser.tab.c parser.tab.h traduzi traduzi.exe lexer_test lexer_test.exe
+	rm -f lex.yy.c parser.tab.c parser.tab.h traduzi traduzi.exe lexer_test lexer_test.exe parser_test parser_test.exe
 
-.PHONY: all parser test test-lexer clean
+.PHONY: all parser test test-parser test-lexer clean

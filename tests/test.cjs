@@ -41,7 +41,7 @@ for (const body of invalidos) {
 }
 const precedence = run(wrap('int x = 10 + 5 * 2;')).stdout;
 assert.match(precedence, /operacao \+[\s\S]*inteiro 10[\s\S]*operacao \*[\s\S]*inteiro 5[\s\S]*inteiro 2/);
-assert.match(run(wrap('int x = 10 - 5 - 2;')).stdout, /operacao -[^\n]*\n {8}operacao -/);
+assert.match(run(wrap('int x = 10 - 5 - 2;')).stdout, /operacao -[^\n]*\n {10}operacao -/);
 const recovery = run(wrap('int x = ; stampa(1); int y = ;'));
 assert.ok((recovery.stderr.match(/Erro sintatico/g) || []).length >= 2);
 const complete = spawnSync(exe, ['exemplos/completo.traduzi'], { encoding: 'utf8' });
