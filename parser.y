@@ -59,7 +59,9 @@ parametro: tipo IDENT {
     $$ = NO(AST_PARAMETRO, $2, @1); free($2); $$->tipo_dado = $1;
 };
 bloco: '[' comandos ']' { $$ = $2; $$->linha = @1.first_line; $$->coluna = @1.first_column; }
-    | '[' comandos error ']' { $$ = $2; yyerrok; };
+    | '[' comandos error ']' {
+        $$ = $2; $$->linha = @1.first_line; $$->coluna = @1.first_column; yyerrok;
+    };
 comandos: %empty { $$ = NO(AST_BLOCO, NULL, @$); }
     | comandos comando { $$ = ast_adicionar($1, $2); }
     | comandos error ';' { $$ = $1; yyerrok; };
@@ -100,6 +102,9 @@ para: PER IDENT DE expressao ATE expressao bloco {
     $$ = NO(AST_PARA, $2, @1); free($2);
     ast_adicionar($$, $4); ast_adicionar($$, $6); ast_adicionar($$, $7);
 };
+/* Precedencia crescente: or, and, not, igualdade, relacional, soma,
+ * produto, menos unario, primario. Recursao a esquerda associa a esquerda.
+ * Comparacoes nao encadeiam; parenteses permitem agrupamento explicito. */
 expressao: ou { $$ = $1; };
 ou: e { $$ = $1; } | ou OR e { $$ = OP("or", $1, $3, @2); };
 e: nao { $$ = $1; } | e AND nao { $$ = OP("and", $1, $3, @2); };

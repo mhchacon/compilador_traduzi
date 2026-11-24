@@ -1,0 +1,37 @@
+(* Traduzi: espacos e comentarios sao removidos pelo Flex.
+   { X } = repeticao; [ X ] = opcional; | = alternativa.
+   IDENT e literais seguem lexer/lexer.l. *)
+programa = acao, { acao } ;
+acao = "acao", (IDENT | "Traduzi"), "(", [parametros], ")",
+       ("void" | "ritorna", tipo), bloco ;
+tipo = "int" | "float" | "string" | "bool" ;
+parametros = tipo, IDENT, { ",", tipo, IDENT } ;
+bloco = "[", { comando }, "]" ;
+comando = declaracao | atribuicao | entrada | saida | condicional
+        | enquanto | para | "fermarsi", ";" | "continuare", ";"
+        | "ritorna", [expressao], ";" | chamada, ";" ;
+declaracao = ["mutabile"], tipo, IDENT, ["=", expressao], ";" ;
+atribuicao = IDENT, "=", expressao, ";" ;
+entrada = "input", "(", IDENT, ")", ";" ;
+saida = "stampa", "(", expressao, ")", ";" ;
+condicional = "in", "caso", "di", condicao, "succede", bloco,
+              ["altrimenti", (bloco | condicional)] ;
+condicao = "-", expressao, FIM_CONDICAO ;
+(* FIM_CONDICAO representa o hifen final antes de succede ou [,
+   conforme o contrato com o lexer; nao e a subtracao. *)
+enquanto = "mentre", condicao, bloco ;
+para = "per", IDENT, "de", expressao, "ate", expressao, bloco ;
+expressao = ou ;
+ou = e, {"or", e} ;
+e = nao, {"and", nao} ;
+nao = "not", nao | igualdade ;
+igualdade = relacional, [("==" | "!="), relacional] ;
+relacional = soma, [(">" | "<" | ">=" | "<="), soma] ;
+soma = termo, {("+" | "-"), termo} ;
+termo = unario, {("*" | "/"), unario} ;
+unario = "-", unario | primario ;
+primario = INT_LIT | FLOAT_LIT | TEXTO_LIT | "true" | "false"
+         | IDENT | chamada | conversao | "(", expressao, ")" ;
+chamada = IDENT, "(", [argumentos], ")" ;
+argumentos = expressao, {",", expressao} ;
+conversao = ("intero" | "reale"), "(", expressao, ")" ;

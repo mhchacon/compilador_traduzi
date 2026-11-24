@@ -29,6 +29,12 @@ traduzi: parser.tab.c lex.yy.c ast.c ast.h semantic.c semantic.h symbol_table.c 
 test: traduzi
 	node tests/test.cjs
 
+parser_test: parser.tab.c parser.tab.h lex.yy.c ast.c ast.h tests/parser_main.c
+	$(CC) $(CFLAGS) -I. -o parser_test parser.tab.c lex.yy.c ast.c tests/parser_main.c
+
+test-parser: parser_test
+	node tests/parser.cjs
+
 # ---- Testes isolados do analisador lexico (integrante 1) ----
 # Cada lexer/testes/X.trz tem uma saida esperada em lexer/testes/X.esperado
 # (tokens com linha:coluna e mensagens de erro). Arquivos valido_*.trz devem
@@ -65,6 +71,6 @@ lexer-esperados: lexer_test
 	done
 
 clean:
-	rm -f lex.yy.c parser.tab.c parser.tab.h traduzi traduzi.exe lexer_test lexer_test.exe
+	rm -f lex.yy.c parser.tab.c parser.tab.h traduzi traduzi.exe lexer_test lexer_test.exe parser_test parser_test.exe
 
-.PHONY: all parser test test-lexer lexer-esperados clean
+.PHONY: all parser test test-parser test-lexer lexer-esperados clean
