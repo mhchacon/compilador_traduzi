@@ -1,22 +1,36 @@
 #include "parser.tab.h"
+#include "codegen_python.h"
 #include "semantic.h"
 #include <stdlib.h>
+#include <string.h>
 
 extern FILE *yyin;
 int yylex_destroy(void);
 
 int main(int argc, char **argv) {
     int resultado;
-    if (argc > 2) {
-        fprintf(stderr, "Uso: %s [arquivo.traduzi]\n", argv[0]);
+    int gerar_python = 0;
+    const char *arquivo = NULL;
+    if (argc > 1 && strcmp(argv[1], "--python") == 0) {
+        gerar_python = 1;
+        if (argc == 3)
+            arquivo = argv[2];
+        else if (argc > 3) {
+            fprintf(stderr, "Uso: %s [--python] [arquivo.traduzi]\n", argv[0]);
+            return EXIT_FAILURE;
+        }
+    } else if (argc == 2) {
+        arquivo = argv[1];
+    } else if (argc > 2) {
+        fprintf(stderr, "Uso: %s [--python] [arquivo.traduzi]\n", argv[0]);
         return EXIT_FAILURE;
     }
-    if (argc == 2) {
-        yyin = fopen(argv[1], "rb");
-        if (!yyin) { perror(argv[1]); return EXIT_FAILURE; }
+    if (arquivo) {
+        yyin = fopen(arquivo, "rb");
+        if (!yyin) { perror(arquivo); return EXIT_FAILURE; }
     }
     resultado = yyparse();
-    if (argc == 2) fclose(yyin);
+    if (arquivo) fclose(yyin);
     yylex_destroy();
     if (!resultado && !erros_sintaticos && !erros_lexicos) {
         if (!check_semantics(ast_raiz)) {
@@ -24,7 +38,10 @@ int main(int argc, char **argv) {
             ast_raiz = NULL;
             return EXIT_FAILURE;
         }
-        ast_imprimir(ast_raiz, stdout, 0);
+        if (gerar_python)
+            generate_python(ast_raiz, stdout);
+        else
+            ast_imprimir(ast_raiz, stdout, 0);
     }
     ast_liberar(ast_raiz);
     ast_raiz = NULL;

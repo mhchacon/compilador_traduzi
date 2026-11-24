@@ -1,85 +1,17 @@
 # Compilador Traduzi
 
-## Entrega Bison e AST (Pessoa 2)
+Compilador da linguagem **Traduzi**, implementado em C com Flex e Bison.
+O projeto executa quatro etapas:
 
-A gramática executável está em `parser.y`; a especificação formal está em
-[`gramatica.ebnf`](gramatica.ebnf). Edite `parser.y` e gere os arquivos
-`parser.tab.c` e `parser.tab.h` com `make parser`, em vez de editar os gerados.
-O Bison usa `%expect 0`, e a compilação trata conflitos como erros.
+1. análise léxica;
+2. análise sintática;
+3. construção e análise da AST;
+4. geração opcional de código Python.
 
-Precedência, da menor para a maior: `or`, `and`, `not`, `== !=`,
-`> < >= <=`, `+ -`, `* /`, menos unário e primários. Operadores binários
-repetíveis associam à esquerda; `not` e menos unário associam à direita.
-Comparações do mesmo nível não encadeiam sem parênteses. A precedência é
-expressa pelos níveis da gramática, sem depender de resolução de conflitos.
-O contrato de tokens, valores e localizações está em `lexer/README.md`.
+O programa só imprime a AST ou gera Python quando o código-fonte passa pela
+análise léxica, sintática e semântica.
 
-### Contrato da AST com as etapas seguintes
-
-O parser entrega `AST *ast_raiz`. Cada nó preserva `tipo`, `valor`,
-`tipo_dado`, `mutavel`, `linha`, `coluna` e um vetor ordenado `filhos`.
-Nomes, literais e operadores ficam em `valor`; declarações, parâmetros e
-ações guardam seu tipo em `tipo_dado`. As posições começam em 1.
-
-| Nó | Ordem dos filhos |
-| --- | --- |
-| Programa | Ações na ordem do código |
-| Ação | Lista de parâmetros, bloco |
-| Parâmetros / argumentos / bloco | Elementos na ordem do código |
-| Declaração | Inicializador opcional |
-| Atribuição / saída / conversão | Expressão |
-| Condicional | Condição, bloco verdadeiro, alternativa opcional (bloco ou condicional) |
-| Enquanto | Condição, bloco |
-| Para | Início, fim, bloco; nome do contador em `valor` |
-| Retorno | Expressão opcional |
-| Chamada | Lista de argumentos (também quando vazia) |
-| Operação | Operando esquerdo e direito; unárias têm um filho |
-| Entrada / parâmetro / identificador / literal / parar / continuar | Sem filhos |
-
-`ast_criar` copia o texto recebido. As ações do parser liberam os valores
-textuais do lexer após copiá-los; os tipos alocados são transferidos ao nó.
-`ast_adicionar` transfere a propriedade do filho ao pai e ignora filhos nulos.
-`ast_liberar` libera recursivamente filhos, textos e tipos. Os `%destructor`
-liberam símbolos descartados durante erros. O chamador deve liberar a raiz
-mesmo após erros recuperáveis e impedir o uso da AST se houver erros.
-
-O parser informa linha/coluna e tokens esperados com `parse.error detailed`
-e LAC. A recuperação sincroniza em `;` e `]` para detectar mais de um erro.
-Restrições como variável declarada, tipos e uso de `fermarsi` em laços são
-verificadas pela análise semântica, que já recebe esta mesma `AST`.
-
-### Testes e evidência de árvore
-
-`make test-parser` compila um executável separado com o Flex real, o Bison
-e a AST, sem a análise semântica. São 31 verificações de sintaxe, precedência,
-associatividade, posições e recuperação. `make test` executa os 35 testes
-integrados. Ambos passaram na validação desta entrega com GCC e Bison do MSYS2.
-
-Por exemplo, `acao Traduzi() void [ int x = 10 + 5 * 2; ]` produz:
-
-```text
-programa (1:1)
-  acao Traduzi tipo=void (1:1)
-    parametros (1:14)
-    bloco (1:21)
-      declaracao x tipo=int (1:23)
-        operacao + (1:34)
-          inteiro 10 (1:31)
-          operacao * (1:38)
-            inteiro 5 (1:36)
-            inteiro 2 (1:40)
-```
-
-Pendência para a Pessoa 3: `codegen_python.c` ainda recebe a estrutura
-legada `ASTNode`, não a `AST` produzida pelo parser, e não participa do
-executável principal. É necessário adaptar o gerador ao contrato acima e
-integrá-lo para concluir a tradução Python.
-
-Compilador da linguagem **Traduzi**, implementado em C. O programa executa
-as etapas de análise léxica, sintática e semântica e imprime a árvore sintática
-abstrata (AST) quando o código é válido.
-
-## Pré-requisitos
+## Requisitos
 
 Instale e deixe disponíveis no `PATH`:
 
@@ -87,130 +19,335 @@ Instale e deixe disponíveis no `PATH`:
 - Make;
 - Flex;
 - Bison;
-- Node.js (necessário para executar os testes).
+- Node.js, usado pelos testes.
 
-No Windows, uma opção é usar o [MSYS2](https://www.msys2.org/) com o ambiente
-MinGW. Os comandos abaixo devem ser executados em um terminal que tenha
-`gcc`, `make`, `flex`, `bison` e `node` disponíveis.
+No Windows, recomenda-se o [MSYS2](https://www.msys2.org/) com o ambiente
+MinGW. Os comandos `gcc`, `make`, `flex`, `bison` e `node` devem funcionar no
+terminal escolhido.
 
-## Como compilar
+## Compilação
 
-Na raiz do projeto, execute:
+Na raiz do projeto:
 
 ```sh
 make traduzi
 ```
 
-Esse comando:
+O alvo:
 
-1. gera `parser.tab.c` e `parser.tab.h` a partir de `parser.y` usando o
-   Bison;
-2. gera `lex.yy.c` a partir de `lexer/lexer.l` usando o Flex;
-3. compila os arquivos C, incluindo a análise semântica e a tabela de
-   símbolos, e cria o executável `traduzi` (ou `traduzi.exe` no Windows).
+1. gera `parser.tab.c` e `parser.tab.h` a partir de `parser.y`;
+2. gera `lex.yy.c` a partir de `lexer/lexer.l`;
+3. compila o tradutor com a AST, a análise semântica, a tabela de símbolos e
+   o gerador Python.
 
-Para gerar apenas os arquivos do parser, use:
+Para gerar somente o parser:
 
 ```sh
 make parser
 ```
 
-## Como executar
+Os arquivos `parser.tab.c`, `parser.tab.h` e `lex.yy.c` são gerados. Altere
+`parser.y` ou `lexer/lexer.l`, nunca os arquivos gerados diretamente.
 
-### Traduzir um arquivo
+## Uso
 
-Passe um arquivo `.traduzi` como argumento:
+### Imprimir a AST
+
+Linux/MSYS2:
 
 ```sh
 ./traduzi exemplos/completo.traduzi
 ```
 
-No Windows, o equivalente é:
+Windows PowerShell:
 
 ```powershell
 .\traduzi.exe exemplos\completo.traduzi
 ```
 
-Se o programa for válido nas três análises, a AST será impressa no terminal.
-Em caso de erro léxico, sintático ou semântico, o diagnóstico será enviado
-para a saída de erro e o processo terminará com falha.
-
-### Ler o código pela entrada padrão
-
-Também é possível executar o tradutor sem informar um arquivo e fornecer o
-código pelo terminal:
+Sem arquivo, o código é lido da entrada padrão:
 
 ```sh
 echo "acao Traduzi() void []" | ./traduzi
 ```
 
-No PowerShell:
-
 ```powershell
 'acao Traduzi() void []' | .\traduzi.exe
 ```
 
-O executável aceita no máximo um arquivo de entrada:
+### Gerar Python
+
+Use `--python` para enviar o programa traduzido para a saída padrão:
+
+```powershell
+.\traduzi.exe --python exemplos\funcoes.traduzi > saida.py
+python saida.py
+```
+
+Também é possível usar a entrada padrão:
+
+```sh
+echo "acao Traduzi() void [ stampa(:Ola:); ]" | ./traduzi --python
+```
+
+O formato da linha de comando é:
 
 ```text
-Uso: traduzi [arquivo.traduzi]
+traduzi [--python] [arquivo.traduzi]
 ```
 
-### Exemplos adicionais
+Com `--python`, o gerador produz funções Python, chamadas, expressões,
+condicionais, laços, entrada, saída, retornos, conversões e o bloco:
 
-Exemplos válidos:
-
-```sh
-./traduzi exemplos/basico.traduzi
-./traduzi exemplos/funcoes.traduzi
-./traduzi exemplos/lacos.traduzi
+```python
+if __name__ == '__main__':
+    Traduzi()
 ```
 
-Exemplos que devem produzir erro semântico:
+Declarações sem inicializador são traduzidas para uma variável com valor
+`None`. Entradas são convertidas para `int`, `float` ou `bool` quando o tipo
+da variável é conhecido; textos permanecem como `str`.
 
-```sh
-./traduzi exemplos/erro_tipo.traduzi
-./traduzi exemplos/erro_variavel.traduzi
-./traduzi exemplos/erro_laco.traduzi
+## Sintaxe da linguagem
+
+Um programa contém uma ou mais ações. `Traduzi` é a ação principal e deve ser
+`void`:
+
+```traduzi
+acao soma(int a, int b) ritorna int [
+    ritorna a + b;
+]
+
+acao Traduzi() void [
+    int resultado = soma(2, 3);
+    stampa(resultado);
+]
 ```
+
+Tipos disponíveis:
+
+```text
+int       inteiros
+float     números reais
+string    textos entre dois-pontos
+bool      true ou false
+void      retorno de ações sem valor
+```
+
+Declarações e atribuições:
+
+```traduzi
+int idade;
+mutabile int contador = 0;
+float media = 7.5;
+string nome = :Mariana:;
+bool ativo = true;
+
+idade = 18;
+input(nome);
+stampa(nome);
+```
+
+Uma variável sem `mutabile` pode receber uma atribuição posterior caso ainda
+não tenha sido inicializada. Depois de inicializada, ela não pode ser alterada.
+
+Condicionais:
+
+```traduzi
+in caso di -idade >= 18- succede [
+    stampa(:Maior:);
+] altrimenti in caso di -idade >= 12- succede [
+    stampa(:Adolescente:);
+] altrimenti [
+    stampa(:Crianca:);
+]
+```
+
+Laços:
+
+```traduzi
+mentre -contador < 3- [
+    contador = contador + 1;
+    continuare;
+]
+
+per i de -1 ate 3 [
+    stampa(i);
+    fermarsi;
+]
+```
+
+`ate` é inclusivo no laço `per`. `fermarsi` e `continuare` só podem ser usados
+dentro de um laço.
+
+Retornos, chamadas e conversões:
+
+```traduzi
+acao dobro(int valor) ritorna int [
+    ritorna valor + valor;
+]
+
+acao Traduzi() void [
+    int valor = dobro(4);
+    float real = reale(valor);
+    int inteiro = intero(real);
+    ritorna;
+]
+```
+
+Operadores, da menor para a maior precedência:
+
+```text
+or
+and
+not
+== !=
+> < >= <=
++ -
+* /
+- unário
+primários e expressões entre parênteses
+```
+
+Operadores binários associam à esquerda. `not` e o menos unário associam à
+direita. Comparações não podem ser encadeadas sem parênteses.
+
+Comentários:
+
+```traduzi
+~> comentário até o fim da linha
+~{ comentário de várias linhas }~
+```
+
+Textos usam dois-pontos, por exemplo `:Olá, mundo:`. Identificadores aceitam
+letras sem acento, números, `_` e não podem começar por número.
+
+## Análise semântica
+
+A tabela de símbolos mantém escopos aninhados e registra:
+
+- nome;
+- tipo;
+- mutabilidade;
+- inicialização;
+- se o símbolo representa uma ação.
+
+A análise semântica verifica:
+
+- existência e unicidade da ação `Traduzi`;
+- declarações duplicadas no mesmo escopo;
+- uso de variáveis declaradas e inicializadas;
+- atribuições a variáveis imutáveis;
+- compatibilidade de tipos;
+- tipos e quantidade de argumentos de chamadas;
+- tipos de condições;
+- limites inteiros de `per`;
+- tipo de retorno;
+- uso de `fermarsi` e `continuare` dentro de laços.
+
+Erros são enviados para `stderr` no formato:
+
+```text
+Erro lexico linha L, coluna C: mensagem
+Erro sintatico linha L, coluna C: mensagem
+Erro semantico linha L, coluna C: mensagem
+```
+
+O processo termina com código diferente de zero quando ocorre qualquer erro.
+
+## AST
+
+O parser entrega `AST *ast_raiz`. Cada nó preserva:
+
+- `tipo`;
+- `valor`;
+- `tipo_dado`;
+- `mutavel`;
+- `linha` e `coluna`;
+- vetor ordenado de `filhos`.
+
+A ordem dos filhos é:
+
+| Nó | Filhos |
+| --- | --- |
+| Programa | ações |
+| Ação | parâmetros, bloco |
+| Declaração | inicializador opcional |
+| Atribuição, saída e conversão | expressão |
+| Condicional | condição, bloco verdadeiro, alternativa opcional |
+| Enquanto | condição, bloco |
+| Para | início, fim, bloco |
+| Retorno | expressão opcional |
+| Chamada | lista de argumentos |
+| Operação | operandos; unárias têm um filho |
+
+`ast_adicionar` transfere a propriedade do filho para o pai. `ast_liberar`
+libera recursivamente filhos, textos e tipos. A AST não deve ser utilizada
+quando o parser ou o lexer registrou erros.
 
 ## Testes
 
-Depois de compilar o executável, execute a suíte de testes do parser e do
-lexer:
+Compile antes de executar os testes:
+
+```sh
+make traduzi
+```
+
+Suíte integrada:
 
 ```sh
 make test
 ```
 
-Para executar somente os testes isolados do analisador léxico:
+Somente parser, precedência, posições e recuperação de erros:
+
+```sh
+make test-parser
+```
+
+Somente lexer:
 
 ```sh
 make test-lexer
 ```
 
-Os testes isolados usam os arquivos em `lexer/testes/`. Para remover os
-arquivos gerados e os executáveis:
+Os testes isolados do lexer usam os arquivos em `lexer/testes/`. Para
+regenerar as saídas esperadas, depois de conferir que a alteração é
+intencional:
+
+```sh
+make lexer-esperados
+```
+
+Para remover executáveis e arquivos gerados:
 
 ```sh
 make clean
 ```
 
-## Estrutura e fluxo
+## Estrutura do projeto
 
-1. O **Flex** converte o código-fonte em tokens.
-2. O **Bison** valida a gramática e constrói a AST.
-3. A análise semântica valida declarações, tipos, escopos, atribuições,
-   chamadas, retornos e comandos de laço.
-4. O programa principal imprime a AST somente quando não há erros.
+- [`lexer/lexer.l`](lexer/lexer.l): analisador léxico;
+- [`lexer/README.md`](lexer/README.md): contrato dos tokens e posições;
+- [`parser.y`](parser.y): gramática Bison e construção da AST;
+- [`gramatica.ebnf`](gramatica.ebnf): especificação formal da gramática;
+- [`ast.c`](ast.c) e [`ast.h`](ast.h): estrutura e gerenciamento da AST;
+- [`semantic.c`](semantic.c) e [`semantic.h`](semantic.h): análise semântica;
+- [`symbol_table.c`](symbol_table.c) e [`symbol_table.h`](symbol_table.h):
+  tabela de símbolos;
+- [`codegen_python.c`](codegen_python.c) e
+  [`codegen_python.h`](codegen_python.h): geração de Python;
+- [`main.c`](main.c): entrada do programa e seleção entre AST e Python;
+- [`Makefile`](Makefile): geração, compilação, testes e limpeza;
+- [`exemplos/`](exemplos/): programas válidos e casos de erro.
 
-Arquivos principais:
+## Limpeza e regeneração
 
-- `parser.y`: gramática e regras de construção da AST;
-- `lexer/lexer.l`: analisador léxico;
-- `ast.c` e `ast.h`: estruturas e operações da AST;
-- `semantic.c` e `semantic.h`: análise semântica;
-- `symbol_table.c` e `symbol_table.h`: tabela de símbolos e escopos;
-- `main.c`: entrada do programa e tratamento do arquivo de entrada;
-- `Makefile`: regras de geração, compilação, testes e limpeza;
-- `exemplos/completo.traduzi`: exemplo completo de programa Traduzi.
+Quando `parser.y` ou `lexer/lexer.l` for alterado, regenere e compile com:
+
+```sh
+make clean
+make traduzi
+```
+
+Não versionar executáveis nem arquivos temporários gerados localmente.

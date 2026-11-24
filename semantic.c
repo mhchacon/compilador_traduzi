@@ -6,6 +6,7 @@
 static int semantic_errors;
 static DataType current_return_type;
 static int loop_depth;
+static const AST *semantic_root;
 
 static void report_error(const AST *node, const char *message)
 {
@@ -33,6 +34,16 @@ static int assignable(DataType target, DataType value)
 static DataType analyze_expression(const AST *node);
 static void analyze_statement(const AST *node);
 
+static const AST *find_action(const char *name)
+{
+    size_t i;
+    for (i = 0; semantic_root && i < semantic_root->quantidade; ++i) {
+        if (strcmp(semantic_root->filhos[i]->valor, name) == 0)
+            return semantic_root->filhos[i];
+    }
+    return NULL;
+}
+
 static void analyze_block(const AST *node)
 {
     size_t i;
@@ -45,6 +56,7 @@ static void analyze_block(const AST *node)
 static DataType analyze_call(const AST *node)
 {
     const Symbol *symbol = lookup_symbol(node->valor);
+    const AST *action;
     const AST *arguments = node->quantidade ? node->filhos[0] : NULL;
     size_t i;
 
@@ -54,8 +66,23 @@ static DataType analyze_call(const AST *node)
         report_error(node, message);
         return T_UNKNOWN;
     }
-    for (i = 0; arguments && i < arguments->quantidade; ++i)
-        analyze_expression(arguments->filhos[i]);
+    action = find_action(node->valor);
+    if (action) {
+        const AST *parameters = action->filhos[0];
+        size_t argument_count = arguments ? arguments->quantidade : 0;
+        size_t parameter_count = parameters ? parameters->quantidade : 0;
+        if (argument_count != parameter_count)
+            report_error(node, "quantidade de argumentos incompativel com a acao.");
+        for (i = 0; i < argument_count; ++i) {
+            DataType argument_type = analyze_expression(arguments->filhos[i]);
+            if (i < parameter_count &&
+                !assignable(type_from_name(parameters->filhos[i]->tipo_dado), argument_type))
+                report_error(arguments->filhos[i], "tipo de argumento incompativel com o parametro.");
+        }
+    } else {
+        for (i = 0; arguments && i < arguments->quantidade; ++i)
+            analyze_expression(arguments->filhos[i]);
+    }
     return symbol->type;
 }
 
@@ -74,6 +101,10 @@ static DataType analyze_expression(const AST *node)
         symbol = lookup_symbol(node->valor);
         if (!symbol || symbol->is_action) {
             report_error(node, "identificador nao declarado.");
+            return T_UNKNOWN;
+        }
+        if (!symbol->is_initialized) {
+            report_error(node, "variavel usada antes de ser inicializada.");
             return T_UNKNOWN;
         }
         return symbol->type;
@@ -111,6 +142,8 @@ static DataType analyze_expression(const AST *node)
             report_error(node, "operacao aritmetica exige operandos numericos.");
         if (right != T_INT && right != T_FLOAT)
             report_error(node, "operacao aritmetica exige operandos numericos.");
+        if (strcmp(node->valor, "/") == 0)
+            return T_FLOAT;
         return left == T_FLOAT || right == T_FLOAT ? T_FLOAT : T_INT;
     default:
         report_error(node, "expressao invalida.");
@@ -225,6 +258,8 @@ static void analyze_action(const AST *node)
         const AST *parameter = parameters->filhos[i];
         if (!add_symbol(parameter->valor, type_from_name(parameter->tipo_dado), 0, 0))
             report_error(parameter, "parametro ja declarado.");
+        else
+            lookup_symbol_current_scope(parameter->valor)->is_initialized = 1;
     }
     for (i = 0; block && i < block->quantidade; ++i)
         analyze_statement(block->filhos[i]);
@@ -238,6 +273,7 @@ int check_semantics(const AST *root)
 
     semantic_errors = 0;
     loop_depth = 0;
+    semantic_root = root;
     init_symbol_table();
     for (i = 0; root && i < root->quantidade; ++i) {
         const AST *action = root->filhos[i];

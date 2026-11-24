@@ -23,8 +23,8 @@ $(LEXER):
 	@echo "Lexer pendente: adicione o arquivo em $(LEXER). Consulte lexer/README.md."
 	@exit 1
 
-traduzi: parser.tab.c lex.yy.c ast.c ast.h semantic.c semantic.h symbol_table.c symbol_table.h main.c
-	$(CC) $(CFLAGS) -o traduzi parser.tab.c lex.yy.c ast.c semantic.c symbol_table.c main.c
+traduzi: parser.tab.c lex.yy.c ast.c ast.h semantic.c semantic.h symbol_table.c symbol_table.h codegen_python.c codegen_python.h main.c
+	$(CC) $(CFLAGS) -o traduzi parser.tab.c lex.yy.c ast.c semantic.c symbol_table.c codegen_python.c main.c
 
 test: traduzi
 	node tests/test.cjs
